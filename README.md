@@ -23,29 +23,27 @@ Cominciamo ad approfondire il nostro flusso di lavoro CI/CD. Nella repository ve
 
 Il nostro flusso di lavoro si attiverà ogni 45 minuti:
 
-```bash
-on:
-  schedule:
-    # Esegui il flusso di lavoro ogni 45 minuti
-    - cron: '*/45* * * *'
+```yml
+# Esegue il flusso di lavoro solo quando triggerato da uno script esterno
+on: [repository_dispatch]
 ```
 Variabili globali d'ambiente:
-```
+```yml
 env:
   DOCKER_BUILDKIT: 1 
 ```
 Lo scopo di questo flusso è la compilazione di nearcore:
-```
+```yml
 jobs:
   build:
 ```
 Specifichiamo la versione di Ubuntu
-```
+```yml
 runs-on: ubuntu-latest
 ```
 Creiamo una [strategy matrix](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) che aiutare con la compilazione e il deployement di differenti release per `testnet` e `betanet`.
 
-```
+```yml
 strategy:
   matrix:
     release-name: ["betanet", "testnet", "mainnet"]
@@ -60,7 +58,7 @@ echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq 
 
 >`DOCKER_IMAGE_NAME` - [a public docker hub repository](https://docs.docker.com/docker-hub/repos/). (Per esempio `dockerusername/nearcore`)  
 >È necessario creare della variabili segrete `DOCKER_IMAGE_NAME`, `DOCKER_USERNAME` e `DOCKER_PASSWORD` tramite Github Secrets ([creazione e salvataggio di segreti crittati](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)).
-```bash
+```yml
 # if previous step is success
 if: ${{ success() }}
         env:
@@ -119,7 +117,7 @@ sudo docker run -dti \
 ```
 
 Per seguire i log:
-```
+```bash
 sudo docker logs nearcore -f
 ```
 
