@@ -2,7 +2,7 @@ name: Automazione-Nearcore
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/45 * * * *'
 
 env:
   DOCKER_BUILDKIT: 1 
