@@ -1,4 +1,4 @@
-name: CICD
+name: Automazione-Nearcore
 
 on:
   schedule:
@@ -16,7 +16,7 @@ jobs:
         release-name: ["betanet", "testnet", "mainnet"]
     steps:
       - uses: actions/checkout@v2
-      - name: Ottieni tag Github
+      - name: Ottienimento tag Github
         env: 
           RELEASE_NAME: ${{ matrix.release-name }}
         run: |
@@ -30,7 +30,7 @@ jobs:
           fi
           echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
 
-      - name: Ottieni tags Docker Hub
+      - name: Ottienimento tags Docker Hub
         if: ${{ success() }}
         env:
           DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
@@ -59,7 +59,7 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
 
-      - name: Pubblica immagine del tag Github nel Registry
+      - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -74,7 +74,7 @@ jobs:
         with:
           rust-version: nightly-2020-03-19
 
-      - name: Clonazione NEARCore
+      - name: Clonazione Nearcore
         if: ${{ success() }}
         uses: actions/checkout@v2
         with:
@@ -87,7 +87,7 @@ jobs:
       - name: Test Neard
         run: cd neard && cargo test 
 
-      - name: Pubblica immagine piu recente di Docker nel Registry
+      - name: Pubblicazione immagine piu recente di Docker nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
         with:

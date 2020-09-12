@@ -1,7 +1,6 @@
-![CICD](https://github.com/48cfu/nearcore-automatizzato/workflows/CICD/badge.svg)
-# Un framework di automazione di nearcore tramite GitHub Actions e Watchtower
-
-In questa guida spiegherò come creare un flusso di lavoro tramite [Github Actions](https://docs.github.com/en/actions) che compili, simuli e faccia il deployement automatico dell'immagine Docker costruito dall'ultimo codice sorgente (tag: "rc" e "beta") del repository [nearcore](https://github.com/nearprotocol/nearcore).
+#### TODO: Triggera il flusso di lavoro a ogni nuovo tag pubblicato invece che periodicamente.
+# Un framework di automazione di nearcore ![Automazione-Nearcore](https://github.com/48cfu/nearcore-automatizzato/workflows/CICD/badge.svg)
+In questa guida spiegherò come creare un flusso di lavoro tramite [Github Actions](https://docs.github.com/en/actions) che compili, simuli e faccia il deployement automatico dell'immagine Docker costruito dall'ultimo codice sorgente (tag: "rc" e "beta") del repository [nearcore](https://github.com/nearprotocol/nearcore). 
 
 ## Introduzione
 Prima di tutto, devi familiarizzare con GitHub Actions con cui puoi creare qualsiasi flusso di lavoro CI/CD tramite le [API](https://developer.github.com/v3/actions/).
@@ -52,17 +51,16 @@ strategy:
     release-name: ["betanet", "testnet", "mainnet"]
 ```
 
-As mentioned abowe jobs contain a list of steps, which GitHub executes in sequence.
+Come accennato in precedenza, il flusso di lavoro contiene una sequenza di tasks che GitHub eseguirà in sequenza.
+1.  Ottieni il tag GitHub in modo da permettere allo script di scaricare e salvare l'apposita versione di nearcore ("rc" or "beta")
+```bash
+echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
+```
+2. Ottieni i tag Docker Hub dove lo script controlla gli ultimi tag delle immagini docker già presenti nella nostra repository [docker hub] (https://hub.docker.com). Se esiste un tag github del passaggio precedente nella repository docker il flusso di lavoro verrà annullato. In caso contrario il nuovo tag github verrà utilizzato per costruire e pubblicare una nuova immagine docker
 
-Step 1: **Get Github Tag** where the script downloading and saving a github tag for a given release name ("rc" or "beta")
-```
-echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
-```
-Step 2: **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
-
-> `DOCKER_IMAGE_NAME` - [a public docker hub repository](https://docs.docker.com/docker-hub/repos/). (ex. `dockerusername/nearcore`)  
->You have to create a secret github variable `DOCKER_IMAGE_NAME`. -> [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
-```
+>`DOCKER_IMAGE_NAME` - [a public docker hub repository](https://docs.docker.com/docker-hub/repos/). (Per esempio `dockerusername/nearcore`)  
+>È necessario creare della variabili segrete `DOCKER_IMAGE_NAME`, `DOCKER_USERNAME` e `DOCKER_PASSWORD` tramite Github Secrets ([creazione e salvataggio di segreti crittati](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)).
+```bash
 # if previous step is success
 if: ${{ success() }}
         env:
@@ -70,43 +68,45 @@ if: ${{ success() }}
         run: |
           ...
 ```
-Step 3: **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Github-Action@master](https://github.com/elgohr/Publish-Docker-Github-Action) is a pre-built action that publishes docker containers. It will build and publish a docker images with the latest github tags (ex. `nearcore:1.8.0-beta.2` or `nearcore:1.7.0-rc.5`).
-The logic of this step is to save the latest github tag to a docker hub repo as a docker image and then check the tags every time to build and publish only new releases of nearcore.
+3. La pubblicazione immagine del tag Github nel Registry  utilizza un'[azione pre-compilazione] (https://github.com/elgohr/Publish-Docker-Github-Action) che si occupa di pubblicare containers docker. Compilerà e pubblicherà l'immagine docker con i tag piu recenti (eg. `nearcore:1.14.0-beta.3` or `nearcore:1.13.0-rc.3`).
 
->`DOCKER_USERNAME` - a Docker ID.
+![](./immagini/docker-tags.png?raw=true) 
 
->`DOCKER_PASSWORD` - a Docker ID password.
+>`DOCKER_USERNAME` - l'ID Docker.
 
->You have to create a secret github variables `DOCKER_USERNAME` and `DOCKER_PASSWORD`. -> [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
-
-Step 4: **Install Rust** - an action which install Rust.
-
-Step 5: **Clone NEARCore** - an action which clone [nearcore](https://github.com/nearprotocol/nearcore) with a tag from step 1.
-
-Step 6: **Cargo Test** - execute tests of a nearcore packages.
-
-Step 7: **Test Neard** - execute tests of neard located in `nearcore/neard/tests`
-
-Step 8: **Publish Latest Docker Image to Registry** - will build and publish(concurrently) a docker images with `${{ matrix.release-name }}`(ex. `nearcore:beta` or `nearcore:rc`) tags.
+>`DOCKER_PASSWORD` - la password Docker.
 
 
-## NEARCore Docker
+4. **Installazione Rust** - un'azione che installa Rust.
 
-#### Install Docker (if not installed)
-```
+5. **Clonazione Nearcore** - un'azione che clona la repository [nearcore](https://github.com/nearprotocol/nearcore) con il tag specificato al punto 1. 
+
+6. **Test Cargo** - Esegue i test per verificare il funzionamento corretto di `nearcore`.
+
+7. **Test Neard** - Esecuzione dei test nella directory `nearcore/neard/tests`.
+
+8. **Pubblicazione immagine piu recente di Docker nel Registry** - compilazione e pubblicazione delle immagini dockercon i tag specificati in `${{ matrix.release-name }}` (e.g. `nearcore:beta` oppure `nearcore:rc`).
+
+![](./immagini/compilazione.png?raw=true) 
+
+
+## Nearcore Docker
+
+#### Installa Docker
+```bash
 sudo apt-get update
 sudo apt install docker.io
 ```
 
-If you are using [nearup](https://github.com/near/nearup) just stop the node:
+Se usi [nearup](https://github.com/near/nearup) fermalo:
 
-```
+```bash
 nearup stop
 ```
->In the future if you will not use docker, you can use nearup again without any problems. 
+>Sarà sempre possibile riutilizzare `nearup`.
 
-After the first run of our workflow a new docker images(`dockerusername/nearcore:beta` and `dockerusername/nearcore:rc`) should be available and we can run the near node with the following command:
-```
+Dopo il primo avvio del flusso di lavoro nuove immagini docker (`dockerusername/nearcore:beta` e `dockerusername/nearcore:rc`) saranno disponibili e sara possibile eseguire `nearcore` con il seguente comando:
+```bash
 sudo docker run -dti \
      --restart always \
      --user 0 \
@@ -118,34 +118,27 @@ sudo docker run -dti \
      -p 24567 dockerusername/nearcore:beta near --home /srv/near run
 ```
 
-To watch the logs:
+Per seguire i log:
 ```
 sudo docker logs nearcore -f
 ```
 
 ## Watchtower
 
-To automate updates of our docker images we can use a great open source tool [Watchtower](https://github.com/containrrr/watchtower).
+Per automatizzare gli aggiornamenti delle nostre immagini Docker possiamo utilizzare un ottimo strumento open-source [Watchtower](https://github.com/containrrr/watchtower).
 
-Watchtower monitors running containers and watches for changes to the images those containers were originally started from. When Watchtower detects that an image has changed, it automatically restarts the container using the new image.  
+Watchtower monitora i container in esecuzione e controlla le modifiche alle immagini da cui quei container sono stati originariamente avviati. Quando Watchtower rileva che un'immagine è cambiata, riavvia automaticamente il contenitore utilizzando la nuova immagine.
 
->With watchtower you can update the running version of your containerized app simply by pushing a new image to the Docker Hub or your own image registry. Watchtower will pull down your new image, gracefully shut down your existing container and restart it with the same options that were used when it was deployed initially. 
+Con watchtower puoi aggiornare la versione in esecuzione della tua app containerizzata semplicemente eseguendo il push di una nuova immagine al Docker Hub o al tuo registro di immagini. Watchtower tirerà giù la tua nuova immagine, spegnerà con grazia il tuo contenitore esistente e lo riavvierà con le stesse opzioni che erano state utilizzate quando è stato distribuito inizialmente. È dunque possibile aggiornare nearcore utilizzando Watchtower.
 
-> With watchtower you can update nearcore, node exporter, near exporter,.... 
-
-Run the watchtower container on your node with the following command:
-```
+Avvia il container di watchtower con il seguente comando:
+```bash
 sudo docker run -d \
     --name watchtower \
     -v /var/run/docker.sock:/var/run/docker.sock \
     containrrr/watchtower
 ```
-Now, Watchtower will start monitoring `nearcore:beta` container. When the workflow push an image to Docker Hub, Watchtower, will detect that a new image is available(about 5-6 minutes). It will gracefully stop the container and start the container using the new image.
+Watchtower inizierà a monitorare il contenitore `nearcore:beta` or `nearcore:rc`. Quando il flusso di lavoro invierà un'immagine a Docker Hub, Watchtower rileverà che è disponibile una nuova immagine (circa 5-6 minuti). Fermerà con grazia il contenitore e avvierà il contenitore usando la nuova immagine.
 
-## Conclusion
-
-A big plus from using workflows is not only free automation, but also saving the entire history of deployments.
-
-Hopefully this guide along with the workflow will make it easier for you to use Github Actions to build and deploy a new releases of [NEARCore](https://github.com/nearprotocol/nearcore).
-
->To use this workflow just fork the repository (or create your own public/private) and [set up secret variables](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets): `DOCKER_IMAGE_NAME`, `DOCKER_USERNAME` and `DOCKER_PASSWORD`
+# Ringraziamenti
+Per questa guida ringrazio [maskenetgoal634](https://github.com/masknetgoal634/nearcore-deploy).
