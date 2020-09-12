@@ -2,7 +2,7 @@ name: CICD
 
 on:
   schedule:
-    - cron: '*/60 * * * *'
+    - cron: '*/45 * * * *'
 
 env:
   DOCKER_BUILDKIT: 1 
@@ -13,10 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release-name: ["mainnet", "testnet", "betanet"]
+        release-name: ["betanet", "testnet", "mainnet"]
     steps:
       - uses: actions/checkout@v2
-      - name: Get Github Tag
+      - name: Ottieni tag Github
         env: 
           RELEASE_NAME: ${{ matrix.release-name }}
         run: |
@@ -28,24 +28,24 @@ jobs:
           elif [ "$RELEASE_NAME" == "betanet" ]; then
             regex="[0-9]+.[0-9]+.[0-9]+-beta+" 
           fi
-          echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > github-tag.txt
+          echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
 
-      - name: Get Docker Hub Tags   
+      - name: Ottieni tags Docker Hub
         if: ${{ success() }}
         env:
           DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
         run: |
           TOKEN=`curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:$DOCKER_IMAGE_NAME:pull" | jq '.token' | sed 's/"//g'`
           TAGS=`curl -s https://registry.hub.docker.com/v2/$DOCKER_IMAGE_NAME/tags/list -H "Authorization: Bearer $TOKEN" | jq ".tags[]" | sed 's/"//g'`
-          github_tag=`cat github-tag.txt`
+          github_tag=`cat tag-github.txt`
           for tag in $TAGS;
           do
             # if $github_tag contains in $tag
             if [[ $tag == *"$github_tag"* ]]; then
-              echo "Tag:$tag already deployed"
+              echo "Tag:$tag gia' deployed"
               exit 1
             elif [ -z "$tag" ]; then
-              # Create an empty Dockerfile for a Docker image with github tag 
+              # Crea un Dockerfile vuoto per l'immagine Docker con tag Github
               touch hello && echo "FROM scratch" > Dockerfile
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
             fi
@@ -59,7 +59,7 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
 
-      - name: Publish GitHub Tag Image to Registry
+      - name: Pubblica immagine del tag Github nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -68,26 +68,26 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ env.RELEASE_VERSION }}
 
-      - name: Install Rust
+      - name: Installazione Rust
         if: ${{ success() }}
         uses: hecrj/setup-rust-action@v1
         with:
           rust-version: nightly-2020-03-19
 
-      - name: Clone NEARCore
+      - name: Clonazione NEARCore
         if: ${{ success() }}
         uses: actions/checkout@v2
         with:
           repository: nearprotocol/nearcore
           ref: ${{ env.RELEASE_VERSION }}
 
-      - name: Cargo Test
+      - name: Test Cargo
         run: cargo test    
 
       - name: Test Neard
         run: cd neard && cargo test 
 
-      - name: Publish Latest Docker Image to Registry
+      - name: Pubblica immagine piu recente di Docker nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
         with:

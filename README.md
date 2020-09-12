@@ -1,63 +1,55 @@
-![CICD](https://github.com/masknetgoal634/nearcore-deploy/workflows/CICD/badge.svg)
+![CICD](https://github.com/48cfu/nearcore-automatizzato/workflows/CICD/badge.svg)
+# Un framework di automazione di nearcore tramite GitHub Actions e Watchtower
 
-# A Fully Automated NEARCore Docker Deployment using GitHub Actions and Watchtower
+In questa guida spiegherò come creare un flusso di lavoro tramite [Github Actions](https://docs.github.com/en/actions) che compili, simuli e faccia il deployement automatico dell'immagine Docker costruito dall'ultimo codice sorgente (tag: "rc" e "beta") del repository [nearcore](https://github.com/nearprotocol/nearcore).
 
-In this guide I will explain how to create a github actions workflow that automatically tests, builds, and deploys a Docker images that built from the latest source code (tags: "rc" and "beta") of [NEARCore](https://github.com/nearprotocol/nearcore) repository.
+## Introduzione
+Prima di tutto, devi familiarizzare con GitHub Actions con cui puoi creare qualsiasi flusso di lavoro CI/CD tramite le [API](https://developer.github.com/v3/actions/).
 
-## Getting started
+Per automatizzare una serie di attività, devi creare flussi di lavoro nel tuo repository GitHub. GitHub cerca i file YAML all'interno della directory `.github/workflows`. Eventi come commit, apertura o chiusura di richieste pull, pianificazioni o web-hook innescano l'inizio di un flusso di lavoro. Per un elenco completo degli eventi disponibili, fare riferimento alla documetazione apposita [qui](https://docs.github.com/en/actions/reference/events-that-trigger-workflows).
 
-First of all, you need to familiarize yourself with [Github Actions](https://docs.github.com/en/actions) with which you can create any CI/CD workflows.
-Also Githab Actions has a good [API](https://developer.github.com/v3/actions/)
+In questa guida utilizzeremo solo uno [`scheduled events`](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events) che consente di attivare un flusso di lavoro in un momento pianificato.
 
-To automate a set of tasks, you need to create workflows in your GitHub repository. GitHub looks for YAML files inside of the `.github/workflows` directory.
-Events like commits, the opening or closing of pull requests, schedules, or web-hooks trigger the start of a workflow. For a complete list of available events, refer to this [documentation](https://docs.github.com/en/actions/reference/events-that-trigger-workflows).
+I flussi di lavoro sono composti da tasks che di default vengono eseguiti contemporaneamente. È possibile configurare i tasks in modo che dipendano dal successo di altri tasks nello stesso flusso di lavoro. I tasks contengono un elenco di passaggi, che GitHub esegue in sequenza. Un passaggio può essere un insieme di comandi della shell o un'azione, che è un pre-compilato, riutilizzabile e implementato in TypeScript o all'interno di un contenitore. Alcune azioni sono fornite dal team di GitHub, mentre la comunità open source ne mantiene molte di più. Il [GitHub Marketplace](https://github.com/marketplace?type=actions) mantiene un catalogo di azioni open-`source note.
 
-In this guide we will use only a [schedule](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events) event that allows to trigger a workflow at a scheduled time.
+GitHub Actions è gratuito per tutti i progetti open-source.
 
-Workflows are composed of jobs, which run concurrently by default. You can configure jobs to depend on the success of other jobs in the same workflow.
-Jobs contain a list of steps, which GitHub executes in sequence. A step can be a set of shell commands or an action, which is a pre-built, reusable step implemented either in TypeScript or inside a container. Some actions are provided by the GitHub team, while the open-source community maintains many more. [The GitHub Marketplace](https://github.com/marketplace?type=actions) keeps a catalog of known open-source actions.
+## Flusso di lavoro CI/CD
 
-GitHub Actions is free for all open-source projects, and private repositories get up to [2000 minutes per month](https://github.com/features/actions#pricing-details)(33,33 hours). For smaller projects, this means being able to take full advantage of automation from the very beginning at no extra cost. You can even use the system for free forever if you use self-hosted runners.
+>Il flusso di lavoro creerà due immagini docker con tag: `dockerusername/nearcore:beta`(betanet) e `dockerusername/nearcore:rc`(testnet).
 
-## CI/CD Workflow
+>Se non disponi di un ID Docker vai al Docker Hub e [crea un account](https://docs.docker.com/docker-hub/). 
 
->The workflow will create two docker images with tags: `dockerusername/nearcore:beta`(betanet) and `dockerusername/nearcore:rc`(testnet)
+Cominciamo ad approfondire il nostro flusso di lavoro CI/CD. Nella repository vedrai il nostro flusso di lavoro [`.github/workflows/main.yml`](https://github.com/48cfu/nearcore-automatizzato/blob/master/.github/workflows/main.yml).
 
->If you don't have a Docker ID. Go to the Docker Hub and [create an account](https://docs.docker.com/docker-hub/). 
+Il nostro flusso di lavoro si attiverà ogni 45 minuti:
 
->Docker Hub is a hosted repository service provided by Docker for finding and sharing container images with your team.
-
-Let get started to dive deep into our CI/CD workflow.
-
-In the repository you will see our workflow [.github/workflows/main.yml](https://github.com/masknetgoal634/nearcore-deploy/blob/master/.github/workflows/main.yml)
-
-Our workflow will trigger by schedule event (trigger every 10 minutes):
-```
+```bash
 on:
   schedule:
-    # Run the workflow every 10 minutes
-    - cron: '*/10* * * *'
+    # Esegui il flusso di lavoro ogni 45 minuti
+    - cron: '*/45* * * *'
 ```
-Global environment variables:
+Variabili globali d'ambiente:
 ```
 env:
   DOCKER_BUILDKIT: 1 
 ```
-In our workflow we have one job:
+Lo scopo di questo flusso è la compilazione di nearcore:
 ```
 jobs:
   build:
 ```
-Also runs on Ubuntu latest 
+Specifichiamo la versione di Ubuntu
 ```
 runs-on: ubuntu-latest
 ```
-Lets create a [strategy matrix](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) to build and deploy different releases for `testnet` and `betanet`.
+Creiamo una [strategy matrix](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) che aiutare con la compilazione e il deployement di differenti release per `testnet` e `betanet`.
 
 ```
 strategy:
   matrix:
-    release-name: ["rc", "beta"]
+    release-name: ["betanet", "testnet", "mainnet"]
 ```
 
 As mentioned abowe jobs contain a list of steps, which GitHub executes in sequence.
