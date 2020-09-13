@@ -6,7 +6,7 @@
 ```bash
 nano ~/.bashrc
 ```
-All fine del file aggiungere `export GIT_PERSONAL_TOKEN=xxxxxxxxxxxxxxxxxxxxxxx` poi `Ctrl+Xx` e Salva con `y`.
+All fine del file aggiungere `export GIT_PERSONAL_TOKEN=xxxxxxxxxxxxxxxxxxxxxxx` poi `Ctrl+x` e Salva con `y`.
 1. Inserisci il tuo nome utente git all'interno di `carabiniere.sh`
 1. (Dopo aver completato TUTTI gli altri punti di questa guida torna su questo punto) Esegui i seguente comandi (oppure crea un servizio usando `systemtcl`)
 ```bash
