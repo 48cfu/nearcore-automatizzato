@@ -39,7 +39,7 @@ GitHub Actions è gratuito per tutti i progetti open-source.
 
 Cominciamo ad approfondire il nostro flusso di lavoro CI/CD. Nella repository vedrai il nostro flusso di lavoro [`.github/workflows/main.yml`](https://github.com/48cfu/nearcore-automatizzato/blob/master/.github/workflows/main.yml).
 
-Il nostro flusso di lavoro si attiverà ogni 45 minuti:
+Il nostro flusso di lavoro si attiverà a ogni nuova versione:
 
 ```yml
 # Esegue il flusso di lavoro solo quando triggerato da uno script esterno
