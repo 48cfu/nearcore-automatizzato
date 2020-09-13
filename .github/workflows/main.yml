@@ -1,4 +1,4 @@
-name: Automazione-Nearcore
+name: nearcore-updater
 
 on: [repository_dispatch]
 

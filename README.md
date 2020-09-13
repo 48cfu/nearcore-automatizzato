@@ -1,5 +1,23 @@
-#### TODO: Triggera il flusso di lavoro a ogni nuovo tag pubblicato invece che periodicamente.
-# Un framework di automazione di nearcore ![Automazione-Nearcore](https://github.com/48cfu/nearcore-automatizzato/workflows/CICD/badge.svg)
+![nearcore-updater](https://github.com/48cfu/nearcore-automatizzato/workflows/CICD/badge.svg)
+# Preparazione
+1. Forka e clona questa repo
+1. Crea un [personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token)
+1. Aggiungi il token appena generato nel tuo `.bashrc`
+```bash
+nano ~/.bashrc
+```
+All fine del file aggiungere `export GIT_PERSONAL_TOKEN=xxxxxxxxxxxxxxxxxxxxxxx` poi `Ctrl+Xx` e Salva con `y`.
+1. Inserisci il tuo nome utente git all'interno di `carabiniere.sh`
+1. (Dopo aver completato TUTTI gli altri punti di questa guida torna su questo punto) Esegui i seguente comandi (oppure crea un servizio usando `systemtcl`)
+```bash
+sudo apt install tmux
+tmux new -s nearcore-updater
+./carabiniere.sh
+```
+
+Per uscire dal terminale utilizzare `Ctrl+b ` e poi `d`. Se vorrai tornare nel terminale con i log di `carabiniere` utilizza `tmux attach -t nearcore-updater`.
+
+# Un framework di automazione di nearcore 
 In questa guida spiegherò come creare un flusso di lavoro tramite [Github Actions](https://docs.github.com/en/actions) che compili, simuli e faccia il deployement automatico dell'immagine Docker costruito dall'ultimo codice sorgente (tag: "rc" e "beta") del repository [nearcore](https://github.com/nearprotocol/nearcore). 
 
 ## Introduzione
