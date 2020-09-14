@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Ottienimento tag Github
         env: 
-          RELEASE_NAME: ${{ github.event.client_payload.network }}
+          RELEASE_NAME: ${{ matrix.release-name }} #${{ github.event.client_payload.network }}
         run: |
           regex=""
           if [ "$RELEASE_NAME" == "mainnet" ]; then 
