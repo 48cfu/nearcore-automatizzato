@@ -2,7 +2,7 @@
 
 source ~/.profile
 network="betanet" # oppure mainnet/testnet
-frequency=$((60*30)) # secondi
+frequency=$((60*60)) # secondi
 your_user=48cfu  # nome utente di git
 your_personal_access_token=$GIT_PERSONAL_TOKEN
 
