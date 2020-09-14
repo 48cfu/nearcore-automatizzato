@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release-name: ${{ github.event.client_payload }}
+        release-name: ${{ github.event.client_payload.network }}
     steps:
       - uses: actions/checkout@v2
       - name: Ottienimento tag Github
