@@ -13,11 +13,11 @@ while true; do
 		echo "Nuova versione disponible. Triggering Github Actions..."
 		version=$(curl -s https://rpc."$network".near.org/status | jq .version.version)
 		curl -X POST https://api.github.com/repos/$your_user/nearcore-automatizzato/dispatches \
-			-H 'Accept: application/vnd.github.everest-preview+json' \
+			-H 'Accept: application/vnd.github.v3+json' \
 			-u $your_user:$your_personal_access_token \
-			--data '{"event_type": '$version', "client_payload": {}}'
+			--data-raw '{"event_type": '$version', "client_payload": {"network": "'$network'"}}'
 	else
-		echo "Nothing to update."
+		echo "Niente da aggiornare."
 	fi
 	echo "Sleep per $frequency secondi"
 	sleep $frequency
