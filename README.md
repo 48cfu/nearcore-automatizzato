@@ -17,7 +17,7 @@ tmux new -s nearcore-updater
 
 Per uscire dal terminale utilizzare `Ctrl+b ` e poi `d`. Se vorrai tornare nel terminale con i log di `carabiniere` utilizza `tmux attach -t nearcore-updater`.
 
-# Un framework di automazione di nearcore 
+# Controllo automatico delle versioni di nearcore 
 In questa guida spiegherò come creare un flusso di lavoro tramite [Github Actions](https://docs.github.com/en/actions) che compili, simuli e faccia il deployement automatico dell'immagine Docker costruito dall'ultimo codice sorgente (tag: "rc" e "beta") del repository [nearcore](https://github.com/nearprotocol/nearcore). 
 
 ## Introduzione
