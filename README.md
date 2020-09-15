@@ -59,13 +59,14 @@ Specifichiamo la versione di Ubuntu
 ```yml
 runs-on: ubuntu-latest
 ```
-Creiamo una [strategy matrix](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) che aiutare con la compilazione e il deployement di differenti release per `testnet` e `betanet`.
+Creiamo una [strategy matrix](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) che aiutarà con la compilazione e il deployement di differenti release per `mainnet`, `testnet` e `betanet`.
 
 ```yml
 strategy:
   matrix:
-    release-name: ["betanet", "testnet", "mainnet"]
+    release-name: ["${{ github.event.client_payload.network }}"]
 ```
+La variabile `github.event.client_payload.network` è specificata nello script `carabiniere.sh` e conterrà `mainnet`, `testnet` o `betanet`.
 
 Come accennato in precedenza, il flusso di lavoro contiene una sequenza di tasks che GitHub eseguirà in sequenza.
 1.  Ottieni il tag GitHub in modo da permettere allo script di scaricare e salvare l'apposita versione di nearcore ("rc" or "beta")
