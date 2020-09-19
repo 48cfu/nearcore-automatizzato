@@ -1,5 +1,5 @@
 ![nearcore-updater](https://github.com/48cfu/nearcore-automatizzato/workflows/nearcore-updater/badge.svg)
-# Preparazione
+# Preliminari
 1. Forka e clona questa repo
 1. Crea un [personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token)
 1. Aggiungi il token appena generato nel tuo `.bashrc`
