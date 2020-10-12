@@ -26,7 +26,7 @@ jobs:
           elif [ "$RELEASE_NAME" == "betanet" ]; then
             regex="[0-9]+.[0-9]+.[0-9]+-beta+" 
           fi
-          echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
+          echo $(curl -s https://api.github.com/repos/near/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
 
       - name: Ottienimento tags Docker Hub
         if: ${{ success() }}
@@ -76,7 +76,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/checkout@v2
         with:
-          repository: nearprotocol/nearcore
+          repository: near/nearcore
           ref: ${{ env.RELEASE_VERSION }}
 
       - name: Test Cargo
