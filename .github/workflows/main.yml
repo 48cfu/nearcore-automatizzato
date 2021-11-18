@@ -49,7 +49,8 @@ jobs:
             fi
           done
           
-          echo ::set-env name=RELEASE_VERSION::$(echo $github_tag)
+          #echo ::set-env name=RELEASE_VERSION::$(echo $github_tag)
+          echo "name=RELEASE_VERSION::$(echo $github_tag)" >> $GITHUB_ENV
 
           # If docker hub is empty
           if [ ${#TAGS[@]} -eq 1 ]; then
