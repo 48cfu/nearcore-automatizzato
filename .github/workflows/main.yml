@@ -26,13 +26,7 @@ jobs:
           elif [ "$RELEASE_NAME" == "betanet" ]; then
             regex="[0-9]+.[0-9]+.[0-9]+-beta+" 
           fi
-          
-          sudo apt-get update
-          sudo apt-get install build-essential
-          sudo apt install gcc-multilib
-          
           echo $(curl -s https://api.github.com/repos/near/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
-
       - name: Ottienimento tags Docker Hub
         if: ${{ success() }}
         env:
@@ -54,15 +48,12 @@ jobs:
             fi
           done
           
-          #echo ::set-env name=RELEASE_VERSION::$(echo $github_tag)
           echo "name=RELEASE_VERSION::$(echo $github_tag)" >> $GITHUB_ENV
-
           # If docker hub is empty
           if [ ${#TAGS[@]} -eq 1 ]; then
               touch hello && echo "FROM scratch" > Dockerfile
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
-
       - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
@@ -76,8 +67,7 @@ jobs:
         if: ${{ success() }}
         uses: hecrj/setup-rust-action@v1
         with:
-          #rust-version: nightly-2020-03-19
-          rust-version: nightly
+          rust-version: nightly-2020-03-19
 
       - name: Clonazione Nearcore
         if: ${{ success() }}
