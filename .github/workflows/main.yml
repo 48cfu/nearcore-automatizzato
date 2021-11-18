@@ -76,12 +76,6 @@ jobs:
           repository: near/nearcore
           ref: ${{ env.RELEASE_VERSION }}
 
-      - name: Test Cargo
-        run: cargo test    
-
-      - name: Test Neard
-        run: cd neard && cargo test  && cargo clean
-
       - name: Pubblicazione immagine piu recente di Docker nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
