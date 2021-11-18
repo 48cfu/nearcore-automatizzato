@@ -87,10 +87,7 @@ jobs:
           ref: ${{ env.RELEASE_VERSION }}
 
       - name: Test Cargo
-        run: 
-          cargo test    
-          sudo chown -R $USER:$USER target
-          cargo clean
+        run: cargo test    
 
       - name: Test Neard
         run: cd neard && cargo test 
