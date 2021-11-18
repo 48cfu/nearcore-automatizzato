@@ -80,7 +80,7 @@ jobs:
         run: cargo test    
 
       - name: Test Neard
-        run: cd neard && cargo test 
+        run: cd neard && cargo test  && cargo clean
 
       - name: Pubblicazione immagine piu recente di Docker nel Registry
         if: ${{ success() }}
