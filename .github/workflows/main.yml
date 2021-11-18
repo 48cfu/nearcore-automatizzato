@@ -26,6 +26,11 @@ jobs:
           elif [ "$RELEASE_NAME" == "betanet" ]; then
             regex="[0-9]+.[0-9]+.[0-9]+-beta+" 
           fi
+          
+          sudo apt-get update
+          sudo apt-get install build-essential
+          sudo apt install gcc-multilib
+          
           echo $(curl -s https://api.github.com/repos/near/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
 
       - name: Ottienimento tags Docker Hub
@@ -71,7 +76,8 @@ jobs:
         if: ${{ success() }}
         uses: hecrj/setup-rust-action@v1
         with:
-          rust-version: nightly-2020-03-19
+          #rust-version: nightly-2020-03-19
+          rust-version: nightly
 
       - name: Clonazione Nearcore
         if: ${{ success() }}
@@ -81,7 +87,10 @@ jobs:
           ref: ${{ env.RELEASE_VERSION }}
 
       - name: Test Cargo
-        run: cargo test    
+        run: 
+          cargo test    
+          sudo chown -R $USER:$USER target
+          cargo clean
 
       - name: Test Neard
         run: cd neard && cargo test 
