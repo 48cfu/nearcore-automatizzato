@@ -59,7 +59,7 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
           
-          echo "github tag\n"
+          echo "github tag \n"
           echo $github_tag
           echo "matrix.version-name\n"
           echo ${{ matrix.version-name }}
