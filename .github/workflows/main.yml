@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         release-name: ["${{ github.event.client_payload.network }}"]
-        version-name: ["${{ github.event.client_payload.version_number }}"]
+        version-name: ["${{ github.event.action }}"]
     steps:
       - uses: actions/checkout@v2
       - name: Ottienimento tag Github
@@ -59,8 +59,6 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
           
-          echo "GITHUB JSON"
-          echo ${{ toJson(github) }}
           echo "TODODO2\n"
           echo ${{ matrix.release-name }}
           echo "TODODO3\n"
@@ -68,7 +66,7 @@ jobs:
           echo "TODODO4\n"
           echo ${{ env.RELEASE_VERSION }}
           echo "TODODO4\n"
-          echo ${{ env.RELEASE_VERSION_1 }}
+          echo ${{ github.event.action }}
           
       - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
