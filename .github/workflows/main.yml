@@ -75,18 +75,19 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ env.RELEASE_VERSION }}
 
-      - name: Installazione Rust
-        if: ${{ success() }}
-        uses: hecrj/setup-rust-action@v1
-        with:
-          rust-version: nightly-2020-03-19
+      #- name: Installazione Rust
+      #  if: ${{ success() }}
+      #  uses: hecrj/setup-rust-action@v1
+      #  with:
+      #    rust-version: nightly-2020-03-19
 
       - name: Clonazione Nearcore
         if: ${{ success() }}
         uses: actions/checkout@v2
         with:
-          repository: near/nearcore/releases/tags/${{ github.event.action }}
+          repository: near/nearcore
           # ref: ${{ env.RELEASE_VERSION }}
+          ref : ${{ github.event.action }}
 
       - name: Pubblicazione immagine piu recente di Docker nel Registry
         if: ${{ success() }}
