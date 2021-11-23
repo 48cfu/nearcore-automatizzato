@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         release-name: ["${{ github.event.client_payload.network }}"]
-        version-name: ["${{ github.event.event_type }}"]
+        version-name: ["${{ github.event.client_payload.version_number }}"]
     steps:
       - uses: actions/checkout@v2
       - name: Ottienimento tag Github
