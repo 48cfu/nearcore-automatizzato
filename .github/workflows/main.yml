@@ -68,7 +68,7 @@ jobs:
           echo "TODODO4\n"
           echo ${{ env.RELEASE_VERSION_1 }}
           echo "TODODO1\n"
-          echo ${{ GITHUB_ENV['RELEASE_VERSION'] }}
+          echo $GITHUB_ENV['RELEASE_VERSION']
           
       - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
