@@ -60,7 +60,7 @@ jobs:
           fi
           
           echo "github tag\n"
-          echo ${{ github_tag }}
+          echo $github_tag
           echo "matrix.version-name\n"
           echo ${{ matrix.version-name }}
           echo "github.event.action\n"
