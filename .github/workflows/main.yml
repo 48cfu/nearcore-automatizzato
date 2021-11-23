@@ -59,13 +59,11 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
           
-          echo "TODODO2\n"
-          echo ${{ matrix.release-name }}
-          echo "TODODO3\n"
+          echo "github tag\n"
+          echo ${{ github_tag }}
+          echo "matrix.version-name\n"
           echo ${{ matrix.version-name }}
-          echo "TODODO4\n"
-          echo ${{ env.RELEASE_VERSION }}
-          echo "TODODO4\n"
+          echo "github.event.action\n"
           echo ${{ github.event.action }}
           
       - name: Pubblicazione immagine del tag Github nel Registry
@@ -87,8 +85,8 @@ jobs:
         if: ${{ success() }}
         uses: actions/checkout@v2
         with:
-          repository: near/nearcore
-          ref: ${{ env.RELEASE_VERSION }}
+          repository: near/nearcore/releases/tags/${{ github.event.action }}
+          # ref: ${{ env.RELEASE_VERSION }}
 
       - name: Pubblicazione immagine piu recente di Docker nel Registry
         if: ${{ success() }}
