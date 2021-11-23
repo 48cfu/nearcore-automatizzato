@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         release-name: ["${{ github.event.client_payload.network }}"]
+        version-name: ["${{ github.event.event_type }}"]
     steps:
       - uses: actions/checkout@v2
       - name: Ottienimento tag Github
@@ -27,6 +28,8 @@ jobs:
             regex="[0-9]+.[0-9]+.[0-9]+-beta+" 
           fi
           echo $(curl -s https://api.github.com/repos/near/nearcore/releases | jq -c -r --arg regex "$regex" 'map(select(.tag_name | test($regex)))[0].tag_name') > tag-github.txt
+          echo "TODODO\n"
+          cat tag-github.txt
       - name: Ottienimento tags Docker Hub
         if: ${{ success() }}
         env:
@@ -54,6 +57,11 @@ jobs:
               touch hello && echo "FROM scratch" > Dockerfile
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
+          
+          echo "TODODO\n"
+          echo $GITHUB_ENV
+          echo "TODODO\n"
+          echo ${{ matrix.release-name }}
       - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
