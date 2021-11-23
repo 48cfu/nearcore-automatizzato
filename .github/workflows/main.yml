@@ -59,6 +59,7 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
           
+          echo "GITHUB JSON"
           echo ${{ toJson(github) }}
           echo "TODODO2\n"
           echo ${{ matrix.release-name }}
@@ -68,8 +69,6 @@ jobs:
           echo ${{ env.RELEASE_VERSION }}
           echo "TODODO4\n"
           echo ${{ env.RELEASE_VERSION_1 }}
-          echo "TODODO1\n"
-          echo  ${{ toJson(GITHUB_ENV) }}
           
       - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
