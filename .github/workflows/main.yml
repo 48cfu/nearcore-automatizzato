@@ -18,6 +18,7 @@ jobs:
       - name: Ottienimento tag Github
         env: 
           RELEASE_NAME: ${{ matrix.release-name }} 
+          RELEASE_VERSION_1: ${{ matrix.version-name }} 
         run: |
           regex=""
           if [ "$RELEASE_NAME" == "mainnet" ]; then 
@@ -59,11 +60,17 @@ jobs:
           fi
           
           echo "TODODO1\n"
-          echo $GITHUB_ENV['RELEASE_VERSION']
+          echo $(GITHUB_ENV['RELEASE_VERSION']
           echo "TODODO2\n"
           echo ${{ matrix.release-name }}
           echo "TODODO3\n"
           echo ${{ matrix.version-name }}
+          echo "TODODO4\n"
+          echo ${{ env.RELEASE_VERSION }}
+          echo "TODODO4\n"
+          echo ${{ env.RELEASE_VERSION_1 }}
+          
+          
       - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
