@@ -58,10 +58,12 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
           
-          echo "TODODO\n"
-          echo $GITHUB_ENV
-          echo "TODODO\n"
+          echo "TODODO1\n"
+          echo $GITHUB_ENV['RELEASE_VERSION']
+          echo "TODODO2\n"
           echo ${{ matrix.release-name }}
+          echo "TODODO3\n"
+          echo ${{ matrix.version-name }}
       - name: Pubblicazione immagine del tag Github nel Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
