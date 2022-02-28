@@ -74,6 +74,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ env.RELEASE_VERSION }}
+          
 
       #- name: Installazione Rust
       #  if: ${{ success() }}
@@ -97,3 +98,4 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ matrix.release-name }}
+          buildargs: make_target=neard-release
